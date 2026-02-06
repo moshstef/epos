@@ -1,4 +1,5 @@
 # EPOS AI Greek Tutor — GitHub Milestones & Issues (Canonical)
+
 Landing Page: OUT OF SCOPE (already implemented)
 
 ---
@@ -29,14 +30,17 @@ Claude should copy titles and descriptions verbatim into GitHub issues.
 ## Milestone 0 — Foundations & Guardrails (Non-Negotiable)
 
 ### Issue 0.1 — Create MVP scope document and non-goals
+
 **Description**
 Create `MVP.md` in the repo root defining:
+
 - What EPOS is
 - What EPOS is NOT
 - Explicit non-goals
 - Forbidden behaviors and “dangerous words” (judge, evaluate, semantic grading, free conversation)
 
 **Definition of Done**
+
 - `MVP.md` exists
 - Non-goals section included
 - Forbidden behaviors explicitly listed
@@ -44,8 +48,10 @@ Create `MVP.md` in the repo root defining:
 ---
 
 ### Issue 0.2 — Create MVP acceptance checklist
+
 **Description**
 Create `ACCEPTANCE_CHECKLIST.md` with binary (yes/no) items enforcing:
+
 - Rails-based prompts
 - Conservative evaluation
 - Guided conversational practice
@@ -54,6 +60,7 @@ Create `ACCEPTANCE_CHECKLIST.md` with binary (yes/no) items enforcing:
 - Engagement-only metrics
 
 **Definition of Done**
+
 - Checklist exists
 - Each item is unambiguous and binary
 - Used as merge gate for PRs
@@ -63,8 +70,10 @@ Create `ACCEPTANCE_CHECKLIST.md` with binary (yes/no) items enforcing:
 ## Milestone 1 — Architecture Skeleton (Thin Slice First)
 
 ### Issue 1.1 — Project bootstrap (Next.js + TS + Tailwind + tooling)
+
 **Description**
 Initialize production-ready baseline:
+
 - Next.js App Router
 - TypeScript
 - Tailwind CSS
@@ -73,6 +82,7 @@ Initialize production-ready baseline:
 - Preview deployment works
 
 **Definition of Done**
+
 - App runs locally
 - Lint and format pass
 - Preview deploy succeeds
@@ -80,8 +90,10 @@ Initialize production-ready baseline:
 ---
 
 ### Issue 1.2 — Define minimal domain model
+
 **Description**
 Create MVP-only data models:
+
 - Lesson
 - Exercise
 - Attempt
@@ -90,6 +102,7 @@ Create MVP-only data models:
 Avoid analytics, scoring, or reporting fields.
 
 **Definition of Done**
+
 - DB schema/migrations applied
 - Relations defined
 - No extra fields beyond MVP needs
@@ -97,20 +110,24 @@ Avoid analytics, scoring, or reporting fields.
 ---
 
 ### Issue 1.3 — Create demo lesson seed
+
 **Description**
 Seed one demo lesson with:
+
 - One speaking exercise
 - Expected phrase
 - Required words
 - Allowed variants
 
 **Definition of Done**
+
 - Seed runs cleanly
 - Demo lesson loads in app
 
 ---
 
 ### Issue 1.4 — Thin slice lesson flow (mocked evaluation)
+
 **Description**
 Implement end-to-end flow:
 Lesson → exercise → submit → mocked pass/retry → persist attempt.
@@ -118,6 +135,7 @@ Lesson → exercise → submit → mocked pass/retry → persist attempt.
 No audio, STT, or LLM yet.
 
 **Definition of Done**
+
 - User completes one exercise
 - Attempt saved in DB
 - Deterministic behavior
@@ -127,14 +145,17 @@ No audio, STT, or LLM yet.
 ## Milestone 2 — Controlled Speaking Practice (Core)
 
 ### Issue 2.1 — Push-to-talk audio recording UI
+
 **Description**
 Mobile-first recording UI:
+
 - Start/stop recording
 - Visual indicator
 - Optional playback
 - Safe re-record
 
 **Definition of Done**
+
 - Works on mobile Safari & Chrome
 - Produces stable audio blob
 - No stuck states
@@ -142,14 +163,17 @@ Mobile-first recording UI:
 ---
 
 ### Issue 2.2 — Audio upload API route
+
 **Description**
 Create API route for audio upload:
+
 - Size limits
 - Content-type validation
 - Timeout handling
 - Clear error responses
 
 **Definition of Done**
+
 - Valid audio accepted
 - Invalid payloads rejected safely
 - Errors surfaced clearly
@@ -157,13 +181,16 @@ Create API route for audio upload:
 ---
 
 ### Issue 2.3 — Speech-to-text integration
+
 **Description**
 Integrate one STT provider:
+
 - Returns transcript (+ confidence if available)
 - Transcript normalization (case, punctuation, trimming)
 - Robust error handling
 
 **Definition of Done**
+
 - Same audio → same transcript
 - Failures handled gracefully
 - Provider latency logged internally
@@ -171,23 +198,26 @@ Integrate one STT provider:
 ---
 
 ### Issue 2.4 — Deterministic Analyzer (rule-based)
+
 **Description**
 Implement non-LLM analyzer:
+
 - Required/missing words
 - Basic word order
 - Pronunciation proxy via STT confidence
 - Limited meaning checks only in clear, unambiguous cases
 
 Output strictly:
+
 ```json
 { "result": "pass" | "retry", "reason": "..." }
 ```
 
 **Definition of Done**
 
-* Fully deterministic
-* Unit tested
-* No semantic grading claims
+- Fully deterministic
+- Unit tested
+- No semantic grading claims
 
 ---
 
@@ -196,16 +226,16 @@ Output strictly:
 **Description**
 Wire UI:
 
-* Prompt display
-* Record + submit
-* Show pass/retry + short reason
-* Retry loop
+- Prompt display
+- Record + submit
+- Show pass/retry + short reason
+- Retry loop
 
 **Definition of Done**
 
-* Smooth retry experience
-* Clear, non-judgmental language
-* No grading terminology
+- Smooth retry experience
+- Clear, non-judgmental language
+- No grading terminology
 
 ---
 
@@ -218,9 +248,9 @@ Create strict schemas for all LLM outputs and validation utilities.
 
 **Definition of Done**
 
-* Schemas defined centrally
-* Invalid LLM output blocked
-* Validation used in all LLM routes
+- Schemas defined centrally
+- Invalid LLM output blocked
+- Validation used in all LLM routes
 
 ---
 
@@ -229,16 +259,16 @@ Create strict schemas for all LLM outputs and validation utilities.
 **Description**
 Implement Coach behavior:
 
-* Encouragement and hints
-* Optional recast
-* Never changes pass/retry
-* Never asks new questions
+- Encouragement and hints
+- Optional recast
+- Never changes pass/retry
+- Never asks new questions
 
 **Definition of Done**
 
-* Output conforms to schema
-* Cannot override analyzer
-* Tone matches “coach, not judge”
+- Output conforms to schema
+- Cannot override analyzer
+- Tone matches “coach, not judge”
 
 ---
 
@@ -247,17 +277,17 @@ Implement Coach behavior:
 **Description**
 Handle:
 
-* Timeouts
-* Invalid schema
-* Provider errors
+- Timeouts
+- Invalid schema
+- Provider errors
 
 Fallback must never block user progress.
 
 **Definition of Done**
 
-* Safe fallback message shown
-* User can continue/retry
-* Errors logged internally
+- Safe fallback message shown
+- User can continue/retry
+- Errors logged internally
 
 ---
 
@@ -266,15 +296,15 @@ Fallback must never block user progress.
 **Description**
 Add regression tests:
 
-* Pass case
-* Retry case
-* Ambiguous utterance
-* Hallucination attempt
+- Pass case
+- Retry case
+- Ambiguous utterance
+- Hallucination attempt
 
 **Definition of Done**
 
-* Tests run in CI
-* Coach never overrides outcome
+- Tests run in CI
+- Coach never overrides outcome
 
 ---
 
@@ -285,19 +315,19 @@ Add regression tests:
 **Description**
 Log all interactions:
 
-* Transcript
-* Analyzer output
-* Coach feedback
-* Lesson/exercise IDs
-* Timestamps
+- Transcript
+- Analyzer output
+- Coach feedback
+- Lesson/exercise IDs
+- Timestamps
 
 Never label as “errors”.
 
 **Definition of Done**
 
-* All attempts logged
-* Terminology is “Silent Memory”
-* No user-facing judgment language
+- All attempts logged
+- Terminology is “Silent Memory”
+- No user-facing judgment language
 
 ---
 
@@ -306,15 +336,15 @@ Never label as “errors”.
 **Description**
 Minimal internal page:
 
-* List/filter attempts
-* View transcripts and outputs
-* CSV export
+- List/filter attempts
+- View transcripts and outputs
+- CSV export
 
 **Definition of Done**
 
-* Protected access
-* Read-only
-* Export works
+- Protected access
+- Read-only
+- Export works
 
 ---
 
@@ -325,15 +355,15 @@ Minimal internal page:
 **Description**
 Implement guided conversation:
 
-* 3–5 predefined questions
-* Linear progression
-* No AI-generated questions
+- 3–5 predefined questions
+- Linear progression
+- No AI-generated questions
 
 **Definition of Done**
 
-* Fixed flow
-* Each turn logged
-* No branching
+- Fixed flow
+- Each turn logged
+- No branching
 
 ---
 
@@ -342,16 +372,16 @@ Implement guided conversation:
 **Description**
 For each response:
 
-* Short acknowledgement
-* Optional recast (taught material only)
-* Move to next question
-* No grading
+- Short acknowledgement
+- Optional recast (taught material only)
+- Move to next question
+- No grading
 
 **Definition of Done**
 
-* No correct/incorrect language
-* No retry mechanics
-* No chat loops
+- No correct/incorrect language
+- No retry mechanics
+- No chat loops
 
 ---
 
@@ -362,16 +392,16 @@ For each response:
 **Description**
 Document Google Sheets template:
 
-* Lessons
-* Exercises
-* Required words
-* Variants
-* Conversation prompts
+- Lessons
+- Exercises
+- Required words
+- Variants
+- Conversation prompts
 
 **Definition of Done**
 
-* Schema documented
-* Sample sheet provided
+- Schema documented
+- Sample sheet provided
 
 ---
 
@@ -380,16 +410,16 @@ Document Google Sheets template:
 **Description**
 Implement import:
 
-* Manual trigger only
-* Validation before publish
-* Upsert + versioning
-* Rollback on failure
+- Manual trigger only
+- Validation before publish
+- Upsert + versioning
+- Rollback on failure
 
 **Definition of Done**
 
-* Failed imports do not affect live content
-* Validation feedback shown
-* Versions tracked
+- Failed imports do not affect live content
+- Validation feedback shown
+- Versions tracked
 
 ---
 
@@ -398,14 +428,14 @@ Implement import:
 **Description**
 Internal page with:
 
-* “Run import” button
-* Status and validation results
+- “Run import” button
+- Status and validation results
 
 **Definition of Done**
 
-* Protected route
-* Clear success/failure feedback
-* No CMS features
+- Protected route
+- Clear success/failure feedback
+- No CMS features
 
 ---
 
@@ -418,9 +448,9 @@ Implement simple auth (magic link or OAuth) suitable for 30–50 users.
 
 **Definition of Done**
 
-* Users can sign in/out
-* Internal routes protected
-* No complex roles system
+- Users can sign in/out
+- Internal routes protected
+- No complex roles system
 
 ---
 
@@ -431,9 +461,9 @@ Minimal onboarding so new users reach first spoken attempt in <2 minutes.
 
 **Definition of Done**
 
-* Fast path to first lesson
-* Mobile-friendly
-* No long forms
+- Fast path to first lesson
+- Mobile-friendly
+- No long forms
 
 ---
 
@@ -444,16 +474,16 @@ Minimal onboarding so new users reach first spoken attempt in <2 minutes.
 **Description**
 Track:
 
-* Active users
-* Sessions
-* Time spent
-* Lesson completion
-* Drop-offs
+- Active users
+- Sessions
+- Time spent
+- Lesson completion
+- Drop-offs
 
 **Definition of Done**
 
-* Metrics stored
-* No learning or performance scoring
+- Metrics stored
+- No learning or performance scoring
 
 ---
 
@@ -464,9 +494,9 @@ Internal page showing engagement summaries.
 
 **Definition of Done**
 
-* Protected access
-* Simple tables/charts
-* Actionable insights
+- Protected access
+- Simple tables/charts
+- Actionable insights
 
 ---
 
@@ -479,9 +509,9 @@ Implement daily/weekly reminders with unsubscribe.
 
 **Definition of Done**
 
-* Opt-in respected
-* Sends logged
-* Easy unsubscribe
+- Opt-in respected
+- Sends logged
+- Easy unsubscribe
 
 ---
 
@@ -490,15 +520,15 @@ Implement daily/weekly reminders with unsubscribe.
 **Description**
 Add rate limiting for:
 
-* Audio uploads
-* STT calls
-* LLM calls
+- Audio uploads
+- STT calls
+- LLM calls
 
 **Definition of Done**
 
-* Limits enforced
-* Friendly error messaging
-* Cost protection in place
+- Limits enforced
+- Friendly error messaging
+- Cost protection in place
 
 ---
 
@@ -507,24 +537,26 @@ Add rate limiting for:
 **Description**
 Document:
 
-* Mobile QA matrix
-* Common failure modes
-* Rollback steps
+- Mobile QA matrix
+- Common failure modes
+- Rollback steps
 
 **Definition of Done**
 
-* `BETA_QA.md` exists
-* Rollback steps documented
-* Known issues tracked
+- `BETA_QA.md` exists
+- Rollback steps documented
+- Known issues tracked
 
 ---
 
 ## Notes for Claude (gh CLI Execution)
 
-* Create milestones in the order listed.
-* Create issues with the exact titles and descriptions.
-* Apply labels as appropriate:
+- Create milestones in the order listed.
+- Create issues with the exact titles and descriptions.
+- Apply labels as appropriate:
   `core`, `risk-high`, `rails`, `stt`, `content`, `logging`, `admin`, `analytics`, `onboarding`, `hardening`.
-* Do NOT create landing page issues.
+- Do NOT create landing page issues.
+
+```
 
 ```

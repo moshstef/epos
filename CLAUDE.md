@@ -25,7 +25,9 @@ This repository is in the **planning-complete, pre-implementation** phase. All p
 ## Core Architecture Principles
 
 ### AI Rails-Based Design
+
 All LLM interactions follow strict rails:
+
 - **JSON schema enforcement** / function calling for all LLM outputs
 - **Role separation**: Analyzer (deterministic, rule-guided, no LLM) vs Coach (feedback, encouragement, LLM-based but constrained)
 - AI **never** invents flow, grading, or questions
@@ -34,7 +36,9 @@ All LLM interactions follow strict rails:
 - Goal: predictable UX and debuggability
 
 ### Evaluation Strategy (Conservative)
+
 Speaking practice checks are rule-based and limited:
+
 - Required/missing words
 - Basic word order
 - Pronunciation via STT confidence
@@ -42,11 +46,13 @@ Speaking practice checks are rule-based and limited:
 - False positives (passing) are preferred over false negatives (failing)
 
 ### Data Model (Minimal)
+
 Four MVP entities: **Lesson**, **Exercise**, **Attempt**, **Session**. No analytics fields, scoring, or proficiency tracking.
 
 ## Feature Boundaries
 
 ### In Scope (MVP)
+
 1. **Controlled Speaking Practice** — push-to-talk, pass/retry outcomes, deterministic analyzer
 2. **Guided Conversational Practice** — 3-5 predefined questions, free responses, optional recast, no grading/scoring/branching
 3. **Silent Memory** — full interaction logging for debugging/UX analysis, never presented as "error tracking" or student evaluation
@@ -56,6 +62,7 @@ Four MVP entities: **Lesson**, **Exercise**, **Attempt**, **Session**. No analyt
 7. **Email Reminders** — simple opt-in daily/weekly
 
 ### Explicitly Out of Scope (MVP)
+
 - Fully open conversational AI
 - Semantic grading or meaning understanding (unqualified)
 - Phoneme-level pronunciation analysis
@@ -90,6 +97,7 @@ Implementation order is defined in `epos-github-milestones-issues.md`:
 ## PR Workflow
 
 All PRs must use `.github/pull_request_template.md` which includes:
+
 - MVP guardrail confirmations (no semantic grading, no free chat, no payments, no CMS)
 - Checklist mapping to the final review checklist (`MVP-final-review-checklist.md`)
 - Mobile testing requirements (Safari, Chrome)

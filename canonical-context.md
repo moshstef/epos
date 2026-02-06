@@ -1,7 +1,9 @@
 # 📌 Canonical Context — EPOS AI Greek Tutor (MVP)
 
 ## 1. Product Goal
+
 MVP for an **AI-assisted Greek language tutor**, web-based (mobile-friendly), focused on:
+
 - speaking practice
 - natural, supportive feedback
 - stability and clearly defined scope
@@ -11,6 +13,7 @@ The MVP is intended for a **soft beta of ~30–50 users**.
 ---
 
 ## 2. Core Product Philosophy
+
 - The AI is **not a “teacher that judges”**.
 - The AI acts as a **coach / conversational partner**.
 - MVP goal:  
@@ -19,6 +22,7 @@ The MVP is intended for a **soft beta of ~30–50 users**.
 ---
 
 ## 3. Speaking Practice — Controlled (Core)
+
 - Push-to-talk interaction
 - Speech-to-Text (STT) → transcript
 - Clear outcome:
@@ -26,6 +30,7 @@ The MVP is intended for a **soft beta of ~30–50 users**.
   - `retry` (with short reason)
 
 ### MVP Checks
+
 - required / missing words
 - basic word order
 - pronunciation via STT confidence
@@ -36,6 +41,7 @@ The AI **does not change** the grading outcome.
 ---
 
 ## 4. AI Feedback & Prompt Architecture
+
 - Rails-based design
 - JSON schema enforcement / function calling
 - Role separation:
@@ -47,6 +53,7 @@ Goal: **predictable UX and debuggability**.
 ---
 
 ## 5. Guided Conversational Practice (Reinforcement)
+
 (Replaces “open-ended practice”)
 
 - 3–5 **predefined questions** per lesson or weekly cycle
@@ -67,6 +74,7 @@ Goal: **reinforcement and natural flow**, not evaluation.
 ---
 
 ## 6. Silent Memory (Logging)
+
 - **Full interaction logging**:
   - user transcript
   - system feedback / recasts
@@ -82,9 +90,11 @@ The data may be analyzed **after the fact** to extract insights.
 ---
 
 ## 7. Student Logs & Reports (Usage / Engagement)
+
 In the MVP we measure **whether the product works**, not learning outcomes.
 
 ### Included
+
 - active users
 - sessions
 - time spent
@@ -92,6 +102,7 @@ In the MVP we measure **whether the product works**, not learning outcomes.
 - drop-off points
 
 ### Explicitly Excluded
+
 - language proficiency evaluation
 - per-student reports
 - reports sent to teachers
@@ -99,6 +110,7 @@ In the MVP we measure **whether the product works**, not learning outcomes.
 ---
 
 ## 8. Success KPIs (MVP)
+
 - Lesson completion around ~15 minutes
 - Repeat usage
 - Low drop-off
@@ -109,6 +121,7 @@ In the MVP we measure **whether the product works**, not learning outcomes.
 ---
 
 ## 9. Lessons & Content Management
+
 - **Google Sheets** as the source of truth
 - Predefined template
 - **Manual import trigger** via a hidden/internal admin screen
@@ -122,7 +135,9 @@ In the MVP we measure **whether the product works**, not learning outcomes.
 ---
 
 ## 10. Internal / Admin Views (Limited)
+
 Internal views exist only for:
+
 - triggering Google Sheets imports
 - viewing usage reports
 
@@ -131,6 +146,7 @@ This is **not** a full admin panel.
 ---
 
 ## 11. Email Reminders
+
 - Simple daily / weekly reminders
 - Opt-in
 - No advanced personalization
@@ -138,6 +154,7 @@ This is **not** a full admin panel.
 ---
 
 ## 12. Landing Page
+
 - Next.js landing page
 - Copy sourced from `landing-copy.md`
 - Images from `/public/landing`
@@ -147,6 +164,7 @@ This is **not** a full admin panel.
 ---
 
 ## 13. Backend & Infrastructure
+
 - **Next.js full-stack (serverless)** for the MVP
 - Covers:
   - STT / LLM calls
@@ -158,6 +176,7 @@ This is **not** a full admin panel.
 Spring Boot is **not required** for the MVP.
 
 ### Migration Triggers
+
 - streaming voice
 - heavy background jobs
 - queues / orchestration needs
@@ -165,6 +184,7 @@ Spring Boot is **not required** for the MVP.
 ---
 
 ## 14. Explicitly Out of Scope (MVP)
+
 - fully open conversational AI
 - semantic grading
 - phoneme-level pronunciation analysis
@@ -176,6 +196,7 @@ Spring Boot is **not required** for the MVP.
 ---
 
 ## 15. Dangerous Words to Avoid
+
 - “evaluation” (without qualifier)
 - “semantic correction”
 - “meaning understanding” (unqualified)
@@ -183,6 +204,7 @@ Spring Boot is **not required** for the MVP.
 - “free conversation”
 
 Preferred wording:
+
 - guided
 - conservative
 - usage / engagement
@@ -191,12 +213,14 @@ Preferred wording:
 ---
 
 ## 16. Guiding Principle
+
 > In the MVP, we prefer something stable that keeps learners engaged  
 > over something “smart” that judges unreliably.
 
 ---
 
 ## 17. Open Questions (Intentionally Open)
+
 - Will text-based exercises return?
 - When (and if) fully open conversational AI is introduced?
 - Which reports provide real value in Phase 2?
