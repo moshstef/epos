@@ -9,3 +9,52 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
+model Lesson {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  exercises   Exercise[]
+  sessions    Session[]
+}
+
+model Exercise {
+  id              String    @id @default(cuid())
+  lessonId        String
+  type            String    @default("speaking")
+  prompt          String
+  expectedPhrase  String
+  requiredWords   String    @default("[]")
+  allowedVariants String    @default("[]")
+  order           Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lesson          Lesson    @relation(fields: [lessonId], references: [id])
+  attempts        Attempt[]
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  lessonId  String
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  lesson    Lesson    @relation(fields: [lessonId], references: [id])
+  attempts  Attempt[]
+}
+
+model Attempt {
+  id             String   @id @default(cuid())
+  sessionId      String
+  exerciseId     String
+  transcript     String?
+  analyzerOutput String?
+  coachFeedback  String?
+  outcome        String?
+  sttConfidence  Float?
+  createdAt      DateTime @default(now())
+  session        Session  @relation(fields: [sessionId], references: [id])
+  exercise       Exercise @relation(fields: [exerciseId], references: [id])
+}
