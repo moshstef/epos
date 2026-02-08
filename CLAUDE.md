@@ -11,7 +11,7 @@ EPOS is an AI-assisted Greek language tutor MVP focused on speaking practice wit
 
 ## Current State
 
-This repository is in the **planning-complete, pre-implementation** phase. All product decisions, scope, and architecture are defined in documentation. No source code exists yet. Implementation follows the milestone roadmap in `epos-github-milestones-issues.md`.
+This repository is in the **planning-complete, pre-implementation** phase. All product decisions, scope, and architecture are defined in documentation. No source code exists yet. Implementation follows the milestone roadmap in `docs/epos-github-milestones-issues.md`.
 
 ## Tech Stack (Planned)
 
@@ -81,7 +81,7 @@ When writing code, comments, UI copy, or documentation:
 
 ## Development Roadmap (Milestones)
 
-Implementation order is defined in `epos-github-milestones-issues.md`:
+Implementation order is defined in `docs/epos-github-milestones-issues.md`:
 
 - **M0:** Foundations & Guardrails (scope docs, acceptance checklist)
 - **M1:** Architecture Skeleton (Next.js bootstrap, domain model, demo lesson seed, thin slice with mocked evaluation)
@@ -99,16 +99,16 @@ Implementation order is defined in `epos-github-milestones-issues.md`:
 All PRs must use `.github/pull_request_template.md` which includes:
 
 - MVP guardrail confirmations (no semantic grading, no free chat, no payments, no CMS)
-- Checklist mapping to the final review checklist (`MVP-final-review-checklist.md`)
+- Checklist mapping to the final review checklist (`docs/MVP-final-review-checklist.md`)
 - Mobile testing requirements (Safari, Chrome)
 
 ## Reference Documents
 
-- `canonical-context.md` — Complete product specification
-- `decision-log.md` — 15 key decisions with rationale and implications
-- `MVP.md` — Product constitution (intent, boundaries, philosophy). **In conflicts, this document wins over implementation details.**
-- `MVP-final-review-checklist.md` — Binary QA checklist for release readiness
-- `epos-github-milestones-issues.md` — Canonical GitHub issues with Definitions of Done
+- `docs/canonical-context.md` — Complete product specification
+- `docs/decision-log.md` — 15 key decisions with rationale and implications
+- `docs/MVP.md` — Product constitution (intent, boundaries, philosophy). **In conflicts, this document wins over implementation details.**
+- `docs/MVP-final-review-checklist.md` — Binary QA checklist for release readiness
+- `docs/epos-github-milestones-issues.md` — Canonical GitHub issues with Definitions of Done
 
 ## Guiding Principle
 
