@@ -8,3 +8,9 @@ test("renders the EPOS heading", () => {
     screen.getByRole("heading", { level: 1, name: "EPOS" })
   ).toBeInTheDocument();
 });
+
+test("renders a Start Learning link", () => {
+  render(<Home />);
+  const links = screen.getAllByRole("link", { name: "Start Learning" });
+  expect(links[0]).toHaveAttribute("href", "/lessons");
+});
