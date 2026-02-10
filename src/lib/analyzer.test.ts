@@ -3,23 +3,32 @@ import { mockAnalyze } from "./analyzer";
 
 describe("mockAnalyze", () => {
   const requiredWords = ["Γεια", "λένε"];
-  const allowedVariants = [
-    "Γεια σου με λένε Μαρία",
-    "Γεια, με λένε Μαρία",
-  ];
+  const allowedVariants = ["Γεια σου με λένε Μαρία", "Γεια, με λένε Μαρία"];
 
   it("passes on exact variant match", () => {
-    const result = mockAnalyze("Γεια σου με λένε Μαρία", requiredWords, allowedVariants);
+    const result = mockAnalyze(
+      "Γεια σου με λένε Μαρία",
+      requiredWords,
+      allowedVariants
+    );
     expect(result).toEqual({ outcome: "pass" });
   });
 
   it("passes on variant match (case-insensitive)", () => {
-    const result = mockAnalyze("γεια σου με λένε μαρία", requiredWords, allowedVariants);
+    const result = mockAnalyze(
+      "γεια σου με λένε μαρία",
+      requiredWords,
+      allowedVariants
+    );
     expect(result).toEqual({ outcome: "pass" });
   });
 
   it("passes when all required words are present", () => {
-    const result = mockAnalyze("Γεια, με λένε Νίκος", requiredWords, allowedVariants);
+    const result = mockAnalyze(
+      "Γεια, με λένε Νίκος",
+      requiredWords,
+      allowedVariants
+    );
     expect(result).toEqual({ outcome: "pass" });
   });
 

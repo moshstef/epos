@@ -8,7 +8,11 @@ import { createSession, completeSession } from "../actions";
 
 type LessonWithExercises = Lesson & { exercises: Exercise[] };
 
-export default function LessonFlow({ lesson }: { lesson: LessonWithExercises }) {
+export default function LessonFlow({
+  lesson,
+}: {
+  lesson: LessonWithExercises;
+}) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completed, setCompleted] = useState(false);

@@ -32,9 +32,7 @@ describe("parseAllowedVariants", () => {
 
 describe("serializeRequiredWords", () => {
   test("serializes string array to JSON", () => {
-    expect(serializeRequiredWords(["Γεια", "λένε"])).toBe(
-      '["Γεια","λένε"]'
-    );
+    expect(serializeRequiredWords(["Γεια", "λένε"])).toBe('["Γεια","λένε"]');
   });
 
   test("throws on invalid input", () => {

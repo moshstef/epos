@@ -65,9 +65,7 @@ export function ExerciseCard({
               : "bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
           }`}
         >
-          {feedback.outcome === "pass"
-            ? "Great job!"
-            : feedback.reason}
+          {feedback.outcome === "pass" ? "Great job!" : feedback.reason}
         </div>
       )}
     </div>
