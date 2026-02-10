@@ -144,70 +144,89 @@ No audio, STT, or LLM yet.
 
 ## Milestone 2 — Controlled Speaking Practice (Core)
 
-### Issue 2.1 — Push-to-talk audio recording UI
+## Issue 2.1 — Push-to-talk audio recording UI
 
 **Description**
-Mobile-first recording UI:
+Implement a mobile-first push-to-talk recording experience that allows users to:
 
-- Start/stop recording
-- Visual indicator
-- Optional playback
-- Safe re-record
+- start / stop recording
+- optionally play back audio
+- submit audio for evaluation
+
+The UI must clearly communicate recording state and retry flows.
 
 **Definition of Done**
 
-- Works on mobile Safari & Chrome
-- Produces stable audio blob
-- No stuck states
+- Works reliably on mobile Safari and Chrome
+- Audio blob is available client-side
+- Repeat recordings do not crash or leak resources
 
 ---
 
-### Issue 2.2 — Audio upload API route
+## Issue 2.2 — Audio upload API (forward audio to Deepgram, no storage)
 
 **Description**
-Create API route for audio upload:
+Create an API route that accepts recorded audio from the client and forwards the audio bytes directly to Deepgram for transcription.
 
-- Size limits
-- Content-type validation
-- Timeout handling
-- Clear error responses
+**Requirements**
+
+- Accept `multipart/form-data` or raw binary audio
+- Enforce size and duration limits
+- Handle timeouts and safe retries
+- Forward audio **in-memory only** (no disk persistence by default)
+- Return a stable response shape for downstream evaluation and logging
 
 **Definition of Done**
 
-- Valid audio accepted
-- Invalid payloads rejected safely
-- Errors surfaced clearly
+- Upload works reliably on mobile Safari & Chrome
+- Audio bytes are successfully forwarded to Deepgram
+- Clear error responses for:
+  - request too large
+  - unsupported format
+  - Deepgram timeout or failure
+- No raw audio is stored server-side by default
+
+**Notes**
+
+- If debugging later requires audio retention, add a **separate opt-in issue** for short-lived storage (e.g. 24h) behind an environment flag.
 
 ---
 
-### Issue 2.3 — Speech-to-text integration
+## Issue 2.3 — Deepgram STT integration (bytes → transcript)
 
-**Description**
-Integrate one STT provider:
+**Description**  
+Integrate Deepgram pre-recorded transcription by sending uploaded audio bytes from the API route and returning:
 
-- Returns transcript (+ confidence if available)
-- Transcript normalization (case, punctuation, trimming)
-- Robust error handling
+- transcript text
+- confidence score (if available)
+- language metadata (if available)
+
+Implement transcript normalization suitable for Greek evaluation:
+
+- case normalization
+- accent / diacritics handling
+- punctuation stripping (as appropriate)
 
 **Definition of Done**
 
-- Same audio → same transcript
-- Failures handled gracefully
-- Provider latency logged internally
+- Same audio input → same normalized transcript
+- Handles failure cases gracefully (silence, noise, partial speech)
+- Latency acceptable for MVP UX (with retries/timeouts)
+- Raw transcript and normalized transcript are both available, or normalization is deterministic and shared via a utility
 
 ---
 
-### Issue 2.4 — Deterministic Analyzer (rule-based)
+## Issue 2.4 — Deterministic evaluation engine
 
-**Description**
-Implement non-LLM analyzer:
+**Description**  
+Implement a rule-based evaluation engine that checks:
 
-- Required/missing words
-- Basic word order
-- Pronunciation proxy via STT confidence
-- Limited meaning checks only in clear, unambiguous cases
+- required words
+- allowed variants
+- basic word order
+- pronunciation proxy via STT confidence
 
-Output strictly:
+Output must be strictly:
 
 ```json
 { "result": "pass" | "retry", "reason": "..." }
@@ -215,29 +234,37 @@ Output strictly:
 
 **Definition of Done**
 
-- Fully deterministic
-- Unit tested
-- No semantic grading claims
+- Deterministic behavior
+- Unit tests for edge cases
+- Output schema enforced
+- AI feedback does not override evaluation
 
 ---
 
-### Issue 2.5 — Speaking practice UI wiring
+## Issue 2.5 — Audio upload limits, rate limiting, and cost protection
 
 **Description**
-Wire UI:
+Add safeguards to protect the STT pipeline from abuse, excessive cost, and accidental overload when forwarding audio directly to Deepgram.
 
-- Prompt display
-- Record + submit
-- Show pass/retry + short reason
-- Retry loop
+**Requirements**
+
+- Enforce maximum audio duration (e.g. 10–15 seconds)
+- Enforce maximum payload size
+- Rate-limit STT requests per user / IP
+- Reject silent or near-silent audio early (if detectable)
+- Ensure failures are fast and user-friendly
 
 **Definition of Done**
 
-- Smooth retry experience
-- Clear, non-judgmental language
-- No grading terminology
+- Large or long audio is rejected with a clear message
+- Repeated rapid submissions are throttled
+- Deepgram is not called for obviously invalid payloads
+- Cost exposure is bounded for beta usage (30–50 users)
 
----
+**Notes**
+
+- Limits should be conservative for MVP
+- Exact thresholds can be adjusted via environment variables
 
 ## Milestone 3 — LLM Rails & Coach Layer (Highest Risk)
 
