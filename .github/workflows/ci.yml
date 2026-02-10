@@ -9,6 +9,8 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: file:./dev.db
 
     steps:
       - uses: actions/checkout@v4
@@ -24,9 +26,9 @@ jobs:
 
       - run: pnpm exec prisma generate
 
+      - run: pnpm exec prisma migrate deploy
+
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm test
       - run: pnpm build
-        env:
-          DATABASE_URL: file:./dev.db
