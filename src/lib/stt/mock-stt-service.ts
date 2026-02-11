@@ -1,3 +1,4 @@
+import { normalizeGreekTranscript } from "./normalize";
 import type { SttResult, SttService } from "./types";
 
 const MOCK_LATENCY_MS = 200;
@@ -13,7 +14,7 @@ export class MockSttService implements SttService {
 
     return {
       transcript: MOCK_TRANSCRIPT,
-      normalizedTranscript: MOCK_TRANSCRIPT.toLowerCase(),
+      normalizedTranscript: normalizeGreekTranscript(MOCK_TRANSCRIPT),
       confidence: 0.95,
       languageCode: "el",
     };

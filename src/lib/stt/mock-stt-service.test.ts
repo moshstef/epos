@@ -11,7 +11,7 @@ describe("MockSttService", () => {
     );
 
     expect(result.transcript).toBe("Γεια σου με λένε Μαρία");
-    expect(result.normalizedTranscript).toBe("γεια σου με λένε μαρία");
+    expect(result.normalizedTranscript).toBe("γεια σου με λενε μαρια");
   });
 
   it("returns confidence in [0, 1]", async () => {

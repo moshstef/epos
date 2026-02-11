@@ -17,6 +17,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@deepgram/sdk": "^4.11.3",
     "@prisma/adapter-better-sqlite3": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "better-sqlite3": "12.4.1",
