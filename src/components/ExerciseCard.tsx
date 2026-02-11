@@ -26,7 +26,7 @@ export function ExerciseCard({
       const result = await submitAttempt({
         sessionId,
         exerciseId: exercise.id,
-        userInput: input,
+        transcript: input,
       });
       setFeedback(result);
       if (result.outcome === "pass") {

@@ -1,8 +1,13 @@
 "use server";
 
+import { analyze } from "@/lib/analyzer";
 import { prisma } from "@/lib/prisma";
-import { mockAnalyze } from "@/lib/analyzer";
-import { parseRequiredWords, parseAllowedVariants } from "@/lib/schemas";
+import {
+  parseAllowedVariants,
+  parseRequiredWords,
+  validateAnalyzerResult,
+} from "@/lib/schemas";
+import { normalizeGreekTranscript } from "@/lib/stt/normalize";
 
 export async function getLessons() {
   return prisma.lesson.findMany({
@@ -35,11 +40,15 @@ export async function completeSession(sessionId: string) {
 export async function submitAttempt({
   sessionId,
   exerciseId,
-  userInput,
+  transcript,
+  normalizedTranscript,
+  confidence,
 }: {
   sessionId: string;
   exerciseId: string;
-  userInput: string;
+  transcript: string;
+  normalizedTranscript?: string;
+  confidence?: number;
 }) {
   const exercise = await prisma.exercise.findUniqueOrThrow({
     where: { id: exerciseId },
@@ -47,14 +56,30 @@ export async function submitAttempt({
 
   const requiredWords = parseRequiredWords(exercise.requiredWords);
   const allowedVariants = parseAllowedVariants(exercise.allowedVariants);
-  const result = mockAnalyze(userInput, requiredWords, allowedVariants);
+
+  // Normalize on the fly for text input (no pre-normalized transcript)
+  const normalized =
+    normalizedTranscript ?? normalizeGreekTranscript(transcript);
+  const conf = confidence ?? 1.0;
+
+  const result = analyze({
+    transcript,
+    normalizedTranscript: normalized,
+    confidence: conf,
+    requiredWords,
+    allowedVariants,
+    expectedPhrase: exercise.expectedPhrase,
+  });
+
+  validateAnalyzerResult(result);
 
   await prisma.attempt.create({
     data: {
       sessionId,
       exerciseId,
-      transcript: userInput,
+      transcript,
       outcome: result.outcome,
+      sttConfidence: conf,
       analyzerOutput: JSON.stringify(result),
     },
   });
