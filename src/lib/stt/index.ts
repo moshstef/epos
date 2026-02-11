@@ -1,7 +1,11 @@
+import { DeepgramSttService } from "./deepgram-stt-service";
 import { MockSttService } from "./mock-stt-service";
 import type { SttService } from "./types";
 
+export { DeepgramSttService } from "./deepgram-stt-service";
 export { MockSttService } from "./mock-stt-service";
+export { normalizeGreekTranscript } from "./normalize";
+export type { NormalizeOptions } from "./normalize";
 export {
   ACCEPTED_MIME_TYPES,
   MAX_AUDIO_SIZE_BYTES,
@@ -23,10 +27,10 @@ export function createSttService(): SttService {
   switch (provider) {
     case "mock":
       return new MockSttService();
-    case "deepgram":
-      throw new Error(
-        "Deepgram STT provider is not yet implemented. Set STT_PROVIDER=mock or wait for Issue #9."
-      );
+    case "deepgram": {
+      const apiKey = process.env.STT_API_KEY ?? "";
+      return new DeepgramSttService(apiKey);
+    }
     default:
       throw new Error(`Unknown STT_PROVIDER: "${provider}"`);
   }
