@@ -4,6 +4,7 @@ import {
   parseRequiredWords,
   serializeAllowedVariants,
   serializeRequiredWords,
+  validateAnalyzerResult,
 } from "./schemas";
 
 describe("parseRequiredWords", () => {
@@ -45,5 +46,27 @@ describe("serializeRequiredWords", () => {
 describe("serializeAllowedVariants", () => {
   test("serializes string array to JSON", () => {
     expect(serializeAllowedVariants(["a", "b"])).toBe('["a","b"]');
+  });
+});
+
+describe("validateAnalyzerResult", () => {
+  test("accepts pass result", () => {
+    expect(validateAnalyzerResult({ outcome: "pass" })).toEqual({
+      outcome: "pass",
+    });
+  });
+
+  test("accepts retry result with reason", () => {
+    expect(
+      validateAnalyzerResult({ outcome: "retry", reason: "Try again" })
+    ).toEqual({ outcome: "retry", reason: "Try again" });
+  });
+
+  test("rejects invalid outcome", () => {
+    expect(() => validateAnalyzerResult({ outcome: "fail" })).toThrow();
+  });
+
+  test("rejects retry without reason", () => {
+    expect(() => validateAnalyzerResult({ outcome: "retry" })).toThrow();
   });
 });
