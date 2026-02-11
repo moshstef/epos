@@ -98,16 +98,60 @@ Implementation order is defined in `docs/epos-github-milestones-issues.md`:
 
 All issues follow this workflow:
 
-- Read the GitHub issue, understand it, point out any missing or contradictory information
-- Make a detailed plan
-- Create a new feature branch for the issue
-- Implement it, create tests, run tests, checks, prettier, etc
-- Document if necessary
-- Review the code. Does it achieve the goal of the Issue? Is it overengineered? Can it be simplified?
-- Implement any review comments that are obvious improvements. Ask for input if not sure.
-- Rerun checks and tests
-- Commit, push, create PR using the project template (`.github/pull_request_template.md`), merge, and delete feature branch
-- Present a report with useful information
+1. **Planner agent** — Read the GitHub issue, explore the codebase, point out missing or contradictory information, produce a detailed implementation plan
+2. Present plan to user for approval
+3. Create a new feature branch for the issue
+4. Implement it, create tests, run tests, checks, prettier, etc
+5. Document if necessary
+6. **Reviewer agent** — Review the diff against the issue goals, check for over-engineering, MVP guardrail violations, vocabulary rule violations, and simplification opportunities
+7. Implement any review comments that are obvious improvements. Ask for input if not sure.
+8. Rerun checks and tests
+9. **Shipper agent** — Run final checks, commit, push, create PR using the project template, merge, delete feature branch, and produce the final report
+
+### Subagent definitions
+
+#### Planner (model: sonnet)
+
+Invoke via Task tool with `subagent_type: "general-purpose"`, `model: "sonnet"`.
+
+Prompt must include:
+
+- The GitHub issue URL or body
+- Instruction to read the issue, explore the codebase for relevant files and patterns
+- Flag any missing, ambiguous, or contradictory requirements
+- Produce a detailed plan: new files, modified files, key design decisions, test strategy
+- Reference `docs/epos-github-milestones-issues.md` for Definition of Done
+- Reference the Critical Vocabulary Rules and Feature Boundaries sections of this file
+
+#### Reviewer (model: sonnet)
+
+Invoke via Task tool with `subagent_type: "general-purpose"`, `model: "sonnet"`.
+
+Prompt must include:
+
+- The GitHub issue URL or body (for goal comparison)
+- Instruction to review all changed/new files against the issue goals
+- Check for: over-engineering, unnecessary abstractions, missing edge cases, simplification opportunities
+- Check MVP guardrails: no semantic grading, no free chat, no payments, no CMS
+- Check Critical Vocabulary Rules from this file
+- Output: list of actionable suggestions (keep, change, or flag for user input)
+
+#### Shipper (model: haiku)
+
+Invoke via Task tool with `subagent_type: "Bash"`, `model: "haiku"`.
+
+Prompt must include:
+
+- Run `pnpm test`, `pnpm lint`, `pnpm format:check`, `pnpm build` — all must pass
+- Commit with a descriptive message (include `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>`)
+- Push branch, create PR using `.github/pull_request_template.md`, merge, delete feature branch
+- Produce a final report containing:
+  - Summary of changes (files added/modified, what was implemented)
+  - PR URL
+  - **Plan accuracy** (for Planner evaluation):
+    - Deviations from plan: count and description of each
+    - Missed Definition of Done items: any?
+    - Unplanned questions to user during implementation: count
 
 ## PR Workflow
 
