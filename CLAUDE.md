@@ -94,6 +94,21 @@ Implementation order is defined in `docs/epos-github-milestones-issues.md`:
 - **M8:** Usage Metrics (collection, internal dashboard)
 - **M9:** Reminders & Beta Hardening (email reminders, rate limiting, QA checklist)
 
+## Issue workflow
+
+All issues follow this workflow:
+
+- Read the GitHub issue, understand it, point out any missing or contradictory information
+- Make a detailed plan
+- Create a new feature branch for the issue
+- Implement it, create tests, run tests, checks, prettier, etc
+- Document if necessary
+- Review the code. Does it achieve the goal of the Issue? Is it overengineered? Can it be simplified?
+- Implement any review comments that are obvious improvements. Ask for input if not sure.
+- Rerun checks and tests
+- Commit, push, create PR using the project template (`.github/pull_request_template.md`), merge, and delete feature branch
+- Present a report with useful information
+
 ## PR Workflow
 
 All PRs must use `.github/pull_request_template.md` which includes:
