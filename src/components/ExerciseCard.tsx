@@ -53,7 +53,18 @@ export function ExerciseCard({
       const sttResponse = await uploadAudio(blob, mimeType);
 
       if (!sttResponse.ok) {
-        setSttError("We couldn't process your audio. Please try again.");
+        const messages: Record<string, string> = {
+          RATE_LIMIT_EXCEEDED:
+            "You're going a bit fast! Please wait a moment before trying again.",
+          AUDIO_TOO_SHORT:
+            "We couldn't hear anything. Please try recording again.",
+          REQUEST_TOO_LARGE:
+            "Your audio file is too large. Please try a shorter recording.",
+        };
+        setSttError(
+          messages[sttResponse.error.code] ??
+            "We couldn't process your audio. Please try again."
+        );
         return;
       }
 

@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const MAX_DURATION_MS = 15_000;
+const WARN_DURATION_MS = 12_000;
+
 export type RecorderStatus =
   | "idle"
   | "requesting-permission"
@@ -15,6 +18,8 @@ export interface UseAudioRecorderReturn {
   mimeType: string | null;
   durationMs: number;
   error: string | null;
+  nearLimit: boolean;
+  reachedLimit: boolean;
   startRecording: () => void;
   stopRecording: () => void;
   playRecording: () => void;
@@ -37,6 +42,9 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
   const [mimeType, setMimeType] = useState<string | null>(null);
   const [durationMs, setDurationMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [reachedLimit, setReachedLimit] = useState(false);
+
+  const nearLimit = status === "recording" && durationMs >= WARN_DURATION_MS;
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -121,10 +129,16 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         recorder.start();
         setStatus("recording");
         setDurationMs(0);
+        setReachedLimit(false);
 
         const startTime = Date.now();
         timerRef.current = setInterval(() => {
-          setDurationMs(Date.now() - startTime);
+          const elapsed = Date.now() - startTime;
+          setDurationMs(elapsed);
+          if (elapsed >= MAX_DURATION_MS && recorder.state === "recording") {
+            recorder.stop();
+            setReachedLimit(true);
+          }
         }, 100);
       })
       .catch(() => {
@@ -180,6 +194,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     setAudioBlob(null);
     setMimeType(null);
     setDurationMs(0);
+    setReachedLimit(false);
     setStatus("idle");
   }, [revokeBlobUrl]);
 
@@ -189,6 +204,8 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     mimeType,
     durationMs,
     error,
+    nearLimit,
+    reachedLimit,
     startRecording,
     stopRecording,
     playRecording,

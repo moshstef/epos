@@ -10,6 +10,8 @@ const defaultMock: UseAudioRecorderReturn = {
   mimeType: null,
   durationMs: 0,
   error: null,
+  nearLimit: false,
+  reachedLimit: false,
   startRecording: vi.fn(),
   stopRecording: vi.fn(),
   playRecording: vi.fn(),
@@ -70,6 +72,18 @@ describe("AudioRecorder", () => {
     expect(screen.getByLabelText("Stop recording")).toBeInTheDocument();
     expect(screen.getByText("0:03")).toBeInTheDocument();
     expect(screen.getByText("Tap to stop")).toBeInTheDocument();
+  });
+
+  it("shows warning when near duration limit", () => {
+    hookReturn = {
+      ...hookReturn,
+      status: "recording",
+      durationMs: 13000,
+      nearLimit: true,
+    };
+
+    render(<AudioRecorder />);
+    expect(screen.getByText("Finishing soon...")).toBeInTheDocument();
   });
 
   it("shows playback, re-record, and submit controls when recorded", () => {
@@ -149,5 +163,20 @@ describe("AudioRecorder", () => {
     expect(screen.getByLabelText("Submit recording")).toBeDisabled();
     expect(screen.getByText("Checking...")).toBeInTheDocument();
     expect(screen.getByText("Processing your audio...")).toBeInTheDocument();
+  });
+
+  it("shows max duration message when limit reached", () => {
+    hookReturn = {
+      ...hookReturn,
+      status: "recorded",
+      audioBlob: new Blob(["data"]),
+      mimeType: "audio/webm",
+      reachedLimit: true,
+    };
+
+    render(<AudioRecorder />);
+    expect(
+      screen.getByText("Maximum recording length reached.")
+    ).toBeInTheDocument();
   });
 });

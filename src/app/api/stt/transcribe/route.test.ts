@@ -13,6 +13,13 @@ vi.mock("@/lib/stt", async () => {
   };
 });
 
+// Mock the rate limiter
+const mockCheck = vi.fn().mockReturnValue({ allowed: true });
+vi.mock("@/lib/rate-limiter", () => ({
+  getRateLimiter: () => ({ check: mockCheck }),
+  getClientIp: () => "127.0.0.1",
+}));
+
 // Import after mock setup
 const { POST } = await import("./route");
 
@@ -54,17 +61,28 @@ const MOCK_RESULT = {
   languageCode: "el",
 };
 
+// Audio content large enough to pass MIN_AUDIO_SIZE_BYTES (1 KB)
+const VALID_AUDIO = new Uint8Array(2048).fill(42);
+
 describe("POST /api/stt/transcribe", () => {
   beforeEach(() => {
     mockTranscribe.mockReset();
+    mockCheck.mockReturnValue({ allowed: true });
   });
 
   it("returns 200 with transcript for valid multipart audio", async () => {
     mockTranscribe.mockResolvedValueOnce(MOCK_RESULT);
 
-    const req = createMultipartRequest(
-      new TextEncoder().encode("fake-audio-data")
+    const formData = new FormData();
+    formData.append(
+      "audio",
+      new Blob([VALID_AUDIO], { type: "audio/webm" }),
+      "recording.webm"
     );
+    const req = new Request("http://localhost/api/stt/transcribe", {
+      method: "POST",
+      body: formData,
+    });
     const res = await POST(req as unknown as import("next/server").NextRequest);
     const body = await res.json();
 
@@ -79,7 +97,7 @@ describe("POST /api/stt/transcribe", () => {
   it("returns 200 with transcript for valid raw binary audio", async () => {
     mockTranscribe.mockResolvedValueOnce(MOCK_RESULT);
 
-    const req = createRawRequest(new TextEncoder().encode("fake-audio-data"));
+    const req = createRawRequest(VALID_AUDIO);
     const res = await POST(req as unknown as import("next/server").NextRequest);
     const body = await res.json();
 
@@ -108,11 +126,18 @@ describe("POST /api/stt/transcribe", () => {
     expect(body.error.code).toBe(SttErrorCode.VALIDATION_ERROR);
   });
 
+  it("returns 400 for audio below minimum size", async () => {
+    const req = createRawRequest(new Uint8Array(500)); // < 1 KB
+    const res = await POST(req as unknown as import("next/server").NextRequest);
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(body.ok).toBe(false);
+    expect(body.error.code).toBe(SttErrorCode.AUDIO_TOO_SHORT);
+  });
+
   it("returns 415 for unsupported MIME type", async () => {
-    const req = createRawRequest(
-      new TextEncoder().encode("fake-audio-data"),
-      "audio/flac"
-    );
+    const req = createRawRequest(VALID_AUDIO, "audio/flac");
     const res = await POST(req as unknown as import("next/server").NextRequest);
     const body = await res.json();
 
@@ -137,10 +162,22 @@ describe("POST /api/stt/transcribe", () => {
     expect(body.error.code).toBe(SttErrorCode.REQUEST_TOO_LARGE);
   });
 
+  it("returns 429 when rate limited", async () => {
+    mockCheck.mockReturnValue({ allowed: false, retryAfterSeconds: 60 });
+
+    const req = createRawRequest(VALID_AUDIO);
+    const res = await POST(req as unknown as import("next/server").NextRequest);
+    const body = await res.json();
+
+    expect(res.status).toBe(429);
+    expect(body.ok).toBe(false);
+    expect(body.error.code).toBe(SttErrorCode.RATE_LIMIT_EXCEEDED);
+  });
+
   it("returns 504 on STT timeout", async () => {
     mockTranscribe.mockRejectedValueOnce(new Error("Request timeout"));
 
-    const req = createRawRequest(new TextEncoder().encode("fake-audio-data"));
+    const req = createRawRequest(VALID_AUDIO);
     const res = await POST(req as unknown as import("next/server").NextRequest);
     const body = await res.json();
 
@@ -152,7 +189,7 @@ describe("POST /api/stt/transcribe", () => {
   it("returns 502 on STT general failure", async () => {
     mockTranscribe.mockRejectedValueOnce(new Error("Service unavailable"));
 
-    const req = createRawRequest(new TextEncoder().encode("fake-audio-data"));
+    const req = createRawRequest(VALID_AUDIO);
     const res = await POST(req as unknown as import("next/server").NextRequest);
     const body = await res.json();
 

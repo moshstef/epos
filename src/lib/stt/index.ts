@@ -9,6 +9,7 @@ export type { NormalizeOptions } from "./normalize";
 export {
   ACCEPTED_MIME_TYPES,
   MAX_AUDIO_SIZE_BYTES,
+  MIN_AUDIO_SIZE_BYTES,
   SttErrorCode,
   sttErrorResponseSchema,
   sttResponseSchema,
