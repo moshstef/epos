@@ -24,7 +24,7 @@ async function main() {
             type: "speaking",
             prompt: 'Say "Hello, my name is Maria" in Greek.',
             expectedPhrase: "Γεια σου, με λένε Μαρία",
-            requiredWords: JSON.stringify(["Γεια", "λένε"]),
+            requiredWords: JSON.stringify(["Γεια", "με", "λένε", "Μαρία"]),
             allowedVariants: JSON.stringify([
               "Γεια σου με λένε Μαρία",
               "Γεια, με λένε Μαρία",
@@ -43,7 +43,7 @@ async function main() {
             type: "speaking",
             prompt: 'Say "I am fine, thank you" in Greek.',
             expectedPhrase: "Είμαι καλά, ευχαριστώ",
-            requiredWords: JSON.stringify(["καλά", "ευχαριστώ"]),
+            requiredWords: JSON.stringify(["Είμαι", "καλά", "ευχαριστώ"]),
             allowedVariants: JSON.stringify([
               "Είμαι καλά ευχαριστώ",
               "Καλά ευχαριστώ",
