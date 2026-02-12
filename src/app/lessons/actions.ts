@@ -50,39 +50,44 @@ export async function submitAttempt({
   normalizedTranscript?: string;
   confidence?: number;
 }) {
-  const exercise = await prisma.exercise.findUniqueOrThrow({
-    where: { id: exerciseId },
-  });
+  try {
+    const exercise = await prisma.exercise.findUniqueOrThrow({
+      where: { id: exerciseId },
+    });
 
-  const requiredWords = parseRequiredWords(exercise.requiredWords);
-  const allowedVariants = parseAllowedVariants(exercise.allowedVariants);
+    const requiredWords = parseRequiredWords(exercise.requiredWords);
+    const allowedVariants = parseAllowedVariants(exercise.allowedVariants);
 
-  // Normalize on the fly for text input (no pre-normalized transcript)
-  const normalized =
-    normalizedTranscript ?? normalizeGreekTranscript(transcript);
-  const conf = confidence ?? 1.0;
+    // Normalize on the fly for text input (no pre-normalized transcript)
+    const normalized =
+      normalizedTranscript ?? normalizeGreekTranscript(transcript);
+    const conf = confidence ?? 1.0;
 
-  const result = analyze({
-    transcript,
-    normalizedTranscript: normalized,
-    confidence: conf,
-    requiredWords,
-    allowedVariants,
-    expectedPhrase: exercise.expectedPhrase,
-  });
-
-  validateAnalyzerResult(result);
-
-  await prisma.attempt.create({
-    data: {
-      sessionId,
-      exerciseId,
+    const result = analyze({
       transcript,
-      outcome: result.outcome,
-      sttConfidence: conf,
-      analyzerOutput: JSON.stringify(result),
-    },
-  });
+      normalizedTranscript: normalized,
+      confidence: conf,
+      requiredWords,
+      allowedVariants,
+      expectedPhrase: exercise.expectedPhrase,
+    });
 
-  return result;
+    validateAnalyzerResult(result);
+
+    await prisma.attempt.create({
+      data: {
+        sessionId,
+        exerciseId,
+        transcript,
+        outcome: result.outcome,
+        sttConfidence: conf,
+        analyzerOutput: JSON.stringify(result),
+      },
+    });
+
+    return result;
+  } catch (error) {
+    console.error("[submitAttempt] Failed:", { exerciseId, sessionId }, error);
+    throw error;
+  }
 }

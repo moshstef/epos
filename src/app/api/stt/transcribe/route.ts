@@ -118,6 +118,8 @@ export async function POST(
       languageCode: result.languageCode,
     });
   } catch (error) {
+    console.error("[STT] Transcription failed:", error);
+
     if (error instanceof Error && error.message.includes("timeout")) {
       return errorResponse(
         SttErrorCode.STT_TIMEOUT,
