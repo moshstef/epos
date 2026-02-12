@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Lesson, Exercise } from "@/generated/prisma/client";
 import { ExerciseCard } from "@/components/ExerciseCard";
+import { Button, ProgressIndicator, Spinner } from "@/components/ui";
 import { createSession, completeSession } from "../actions";
 
 type LessonWithExercises = Lesson & { exercises: Exercise[] };
@@ -42,30 +43,37 @@ export default function LessonFlow({
     return (
       <div className="text-center">
         <h1 className="text-3xl font-bold">Lesson Complete!</h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-muted">
           Great work finishing &ldquo;{lesson.title}&rdquo;!
         </p>
-        <Link
-          href="/lessons"
-          className="mt-6 inline-block rounded-lg bg-zinc-900 px-6 py-3 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
-          Back to lessons
+        <Link href="/lessons">
+          <Button size="lg" className="mt-6">
+            Back to lessons
+          </Button>
         </Link>
       </div>
     );
   }
 
   if (!sessionId || !exercise) {
-    return <p className="text-zinc-500">Loading...</p>;
+    return (
+      <div className="flex items-center gap-2 text-muted">
+        <Spinner size="sm" />
+        <span>Loading...</span>
+      </div>
+    );
   }
 
   return (
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{lesson.title}</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Exercise {currentIndex + 1} of {lesson.exercises.length}
-        </p>
+        <div className="mt-3">
+          <ProgressIndicator
+            current={currentIndex + 1}
+            total={lesson.exercises.length}
+          />
+        </div>
       </div>
       <ExerciseCard
         key={exercise.id}

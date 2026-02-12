@@ -5,6 +5,7 @@ import type { Exercise } from "@/generated/prisma/client";
 import { submitAttempt } from "@/app/lessons/actions";
 import { uploadAudio } from "@/lib/api-client";
 import type { AnalyzerResult } from "@/lib/analyzer";
+import { Button, Card, FeedbackBanner } from "@/components/ui";
 import { AudioRecorder } from "./AudioRecorder";
 
 export function ExerciseCard({
@@ -91,7 +92,7 @@ export function ExerciseCard({
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
+    <Card>
       <p className="text-lg font-medium">{exercise.prompt}</p>
 
       <div className="mt-4">
@@ -109,19 +110,20 @@ export function ExerciseCard({
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your answer..."
               disabled={isPending || isLocked}
-              className="flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800"
+              className="flex-1 rounded-md border border-border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 dark:bg-zinc-800"
             />
-            <button
+            <Button
               type="submit"
               disabled={isPending || !input.trim() || isLocked}
-              className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
             >
               {isPending ? "Checking..." : "Submit"}
-            </button>
+            </Button>
           </form>
         )}
 
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           type="button"
           onClick={() => {
             setInputMode(inputMode === "audio" ? "text" : "audio");
@@ -129,29 +131,27 @@ export function ExerciseCard({
             setSttError(null);
           }}
           disabled={isSubmittingAudio || isPending}
-          className="mt-3 text-sm text-zinc-500 underline hover:text-zinc-700 disabled:opacity-50 dark:text-zinc-400 dark:hover:text-zinc-200"
+          className="mt-3"
         >
           {inputMode === "audio" ? "Type instead" : "Speak instead"}
-        </button>
+        </Button>
       </div>
 
       {sttError && (
-        <div className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-          {sttError}
+        <div className="mt-3">
+          <FeedbackBanner variant="retry">{sttError}</FeedbackBanner>
         </div>
       )}
 
       {feedback && (
-        <div
-          className={`mt-3 rounded-md px-3 py-2 text-sm ${
-            feedback.outcome === "pass"
-              ? "bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-              : "bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-          }`}
-        >
-          {feedback.outcome === "pass" ? "Great job!" : feedback.reason}
+        <div className="mt-3">
+          <FeedbackBanner
+            variant={feedback.outcome === "pass" ? "pass" : "retry"}
+          >
+            {feedback.outcome === "pass" ? "Great job!" : feedback.reason}
+          </FeedbackBanner>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
+import { Button, Spinner, FeedbackBanner } from "@/components/ui";
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -44,41 +45,24 @@ export function AudioRecorder({
       {/* Main action button */}
       {(status === "idle" || status === "requesting-permission") && (
         <>
-          <button
+          <Button
+            variant="icon"
+            size="icon-lg"
             type="button"
             onClick={startRecording}
             disabled={disabled || status === "requesting-permission"}
             aria-label="Start recording"
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-900 text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
           >
             {status === "requesting-permission" ? (
-              <svg
-                className="h-6 w-6 animate-spin"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
+              <Spinner size="md" />
             ) : (
               <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
               </svg>
             )}
-          </button>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          </Button>
+          <p className="text-sm text-muted">
             {status === "requesting-permission"
               ? "Requesting microphone access..."
               : "Tap to start speaking"}
@@ -88,25 +72,26 @@ export function AudioRecorder({
 
       {status === "recording" && (
         <>
-          <button
+          <Button
+            variant="danger"
+            size="icon-lg"
             type="button"
             onClick={stopRecording}
             aria-label="Stop recording"
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 text-white transition-colors hover:bg-red-700"
           >
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="6" width="12" height="12" rx="2" />
             </svg>
-          </button>
+          </Button>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
             <span
-              className={`text-sm font-medium tabular-nums ${nearLimit ? "text-amber-600 dark:text-amber-400" : "text-zinc-700 dark:text-zinc-300"}`}
+              className={`text-sm font-medium tabular-nums ${nearLimit ? "text-retry-text dark:text-amber-400" : "text-zinc-700 dark:text-zinc-300"}`}
             >
               {formatDuration(durationMs)}
             </span>
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             {nearLimit ? "Finishing soon..." : "Tap to stop"}
           </p>
         </>
@@ -115,14 +100,15 @@ export function AudioRecorder({
       {(status === "recorded" || status === "playing") && (
         <>
           <div className="flex items-center gap-3">
-            <button
+            <Button
+              variant="icon"
+              size="icon"
               type="button"
               onClick={status === "playing" ? stopPlayback : playRecording}
               disabled={submitting}
               aria-label={
                 status === "playing" ? "Stop playback" : "Play recording"
               }
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
             >
               {status === "playing" ? (
                 <svg
@@ -141,13 +127,14 @@ export function AudioRecorder({
                   <path d="M8 5v14l11-7z" />
                 </svg>
               )}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="icon-outline"
+              size="icon"
               type="button"
               onClick={discardRecording}
               disabled={submitting}
               aria-label="Re-record"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800"
             >
               <svg
                 className="h-4 w-4"
@@ -161,18 +148,19 @@ export function AudioRecorder({
                 <path d="M1 4v6h6" />
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="success"
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
               aria-label="Submit recording"
-              className="flex h-10 items-center justify-center rounded-full bg-green-600 px-4 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+              className="px-4"
             >
               {submitting ? "Checking..." : "Submit"}
-            </button>
+            </Button>
           </div>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-muted">
             {submitting
               ? "Processing your audio..."
               : "Listen back, re-record, or submit."}
@@ -181,16 +169,12 @@ export function AudioRecorder({
       )}
 
       {reachedLimit && (
-        <p className="text-sm text-amber-600 dark:text-amber-400">
+        <p className="text-sm text-retry-text dark:text-amber-400">
           Maximum recording length reached.
         </p>
       )}
 
-      {error && (
-        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-          {error}
-        </p>
-      )}
+      {error && <FeedbackBanner variant="retry">{error}</FeedbackBanner>}
     </div>
   );
 }
