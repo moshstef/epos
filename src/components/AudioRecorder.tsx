@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 
 function formatDuration(ms: number): string {
@@ -11,11 +10,13 @@ function formatDuration(ms: number): string {
 }
 
 export function AudioRecorder({
-  onBlobReady,
+  onSubmit,
   disabled = false,
+  submitting = false,
 }: {
-  onBlobReady?: (blob: Blob, mimeType: string) => void;
+  onSubmit?: (blob: Blob, mimeType: string) => void;
   disabled?: boolean;
+  submitting?: boolean;
 }) {
   const {
     status,
@@ -30,11 +31,11 @@ export function AudioRecorder({
     discardRecording,
   } = useAudioRecorder();
 
-  useEffect(() => {
-    if (status === "recorded" && audioBlob && mimeType) {
-      onBlobReady?.(audioBlob, mimeType);
+  function handleSubmit() {
+    if (audioBlob && mimeType) {
+      onSubmit?.(audioBlob, mimeType);
     }
-  }, [status, audioBlob, mimeType, onBlobReady]);
+  }
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -113,10 +114,11 @@ export function AudioRecorder({
             <button
               type="button"
               onClick={status === "playing" ? stopPlayback : playRecording}
+              disabled={submitting}
               aria-label={
                 status === "playing" ? "Stop playback" : "Play recording"
               }
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
             >
               {status === "playing" ? (
                 <svg
@@ -139,8 +141,9 @@ export function AudioRecorder({
             <button
               type="button"
               onClick={discardRecording}
+              disabled={submitting}
               aria-label="Re-record"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-300 text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800"
             >
               <svg
                 className="h-4 w-4"
@@ -155,9 +158,20 @@ export function AudioRecorder({
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
             </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={submitting}
+              aria-label="Submit recording"
+              className="flex h-10 items-center justify-center rounded-full bg-green-600 px-4 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+            >
+              {submitting ? "Checking..." : "Submit"}
+            </button>
           </div>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Ready! Listen back or try again.
+            {submitting
+              ? "Processing your audio..."
+              : "Listen back, re-record, or submit."}
           </p>
         </>
       )}
