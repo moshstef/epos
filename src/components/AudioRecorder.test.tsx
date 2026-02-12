@@ -72,7 +72,7 @@ describe("AudioRecorder", () => {
     expect(screen.getByText("Tap to stop")).toBeInTheDocument();
   });
 
-  it("shows playback and re-record controls when recorded", () => {
+  it("shows playback, re-record, and submit controls when recorded", () => {
     hookReturn = {
       ...hookReturn,
       status: "recorded",
@@ -83,8 +83,9 @@ describe("AudioRecorder", () => {
     render(<AudioRecorder />);
     expect(screen.getByLabelText("Play recording")).toBeInTheDocument();
     expect(screen.getByLabelText("Re-record")).toBeInTheDocument();
+    expect(screen.getByLabelText("Submit recording")).toBeInTheDocument();
     expect(
-      screen.getByText("Ready! Listen back or try again.")
+      screen.getByText("Listen back, re-record, or submit.")
     ).toBeInTheDocument();
   });
 
@@ -112,9 +113,10 @@ describe("AudioRecorder", () => {
     ).toBeInTheDocument();
   });
 
-  it("calls onBlobReady when recording completes", () => {
-    const onBlobReady = vi.fn();
+  it("calls onSubmit when submit button clicked", async () => {
+    const onSubmit = vi.fn();
     const blob = new Blob(["data"]);
+    const user = userEvent.setup();
 
     hookReturn = {
       ...hookReturn,
@@ -123,12 +125,29 @@ describe("AudioRecorder", () => {
       mimeType: "audio/webm",
     };
 
-    render(<AudioRecorder onBlobReady={onBlobReady} />);
-    expect(onBlobReady).toHaveBeenCalledWith(blob, "audio/webm");
+    render(<AudioRecorder onSubmit={onSubmit} />);
+    await user.click(screen.getByLabelText("Submit recording"));
+    expect(onSubmit).toHaveBeenCalledWith(blob, "audio/webm");
   });
 
   it("respects disabled prop", () => {
     render(<AudioRecorder disabled />);
     expect(screen.getByLabelText("Start recording")).toBeDisabled();
+  });
+
+  it("disables controls when submitting", () => {
+    hookReturn = {
+      ...hookReturn,
+      status: "recorded",
+      audioBlob: new Blob(["data"]),
+      mimeType: "audio/webm",
+    };
+
+    render(<AudioRecorder submitting />);
+    expect(screen.getByLabelText("Play recording")).toBeDisabled();
+    expect(screen.getByLabelText("Re-record")).toBeDisabled();
+    expect(screen.getByLabelText("Submit recording")).toBeDisabled();
+    expect(screen.getByText("Checking...")).toBeInTheDocument();
+    expect(screen.getByText("Processing your audio...")).toBeInTheDocument();
   });
 });
