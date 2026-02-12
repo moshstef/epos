@@ -17,6 +17,7 @@ export default function LessonFlow({
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [autoPlayTts, setAutoPlayTts] = useState(false);
   const sessionCreated = useRef(false);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function LessonFlow({
 
   const exercise = lesson.exercises[currentIndex];
 
-  async function handleExerciseComplete() {
+  async function handleNext() {
     const nextIndex = currentIndex + 1;
     if (nextIndex >= lesson.exercises.length) {
       if (sessionId) {
@@ -35,6 +36,7 @@ export default function LessonFlow({
       }
       setCompleted(true);
     } else {
+      setAutoPlayTts(true);
       setCurrentIndex(nextIndex);
     }
   }
@@ -79,7 +81,8 @@ export default function LessonFlow({
         key={exercise.id}
         exercise={exercise}
         sessionId={sessionId}
-        onComplete={handleExerciseComplete}
+        autoPlayPrompt={autoPlayTts}
+        onNext={handleNext}
       />
     </div>
   );

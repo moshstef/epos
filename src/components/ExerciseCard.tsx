@@ -7,15 +7,18 @@ import { uploadAudio } from "@/lib/api-client";
 import type { AnalyzerResult } from "@/lib/analyzer";
 import { Button, Card, FeedbackBanner } from "@/components/ui";
 import { AudioRecorder } from "./AudioRecorder";
+import { AudioPlayer } from "./AudioPlayer";
 
 export function ExerciseCard({
   exercise,
   sessionId,
-  onComplete,
+  autoPlayPrompt = false,
+  onNext,
 }: {
   exercise: Exercise;
   sessionId: string;
-  onComplete: () => void;
+  autoPlayPrompt?: boolean;
+  onNext: () => void;
 }) {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState<AnalyzerResult | null>(null);
@@ -23,6 +26,7 @@ export function ExerciseCard({
   const [isPending, startTransition] = useTransition();
   const [isSubmittingAudio, setIsSubmittingAudio] = useState(false);
   const [inputMode, setInputMode] = useState<"audio" | "text">("audio");
+  const [showHint, setShowHint] = useState(false);
 
   const isLocked = feedback?.outcome === "pass";
 
@@ -35,13 +39,6 @@ export function ExerciseCard({
         transcript: input,
       });
       setFeedback(result);
-      if (result.outcome === "pass") {
-        setTimeout(() => {
-          setInput("");
-          setFeedback(null);
-          onComplete();
-        }, 1200);
-      }
     });
   }
 
@@ -78,12 +75,6 @@ export function ExerciseCard({
       });
 
       setFeedback(result);
-      if (result.outcome === "pass") {
-        setTimeout(() => {
-          setFeedback(null);
-          onComplete();
-        }, 1200);
-      }
     } catch {
       setSttError("Something went wrong. Please try again.");
     } finally {
@@ -93,7 +84,21 @@ export function ExerciseCard({
 
   return (
     <Card>
-      <p className="text-lg font-medium">{exercise.prompt}</p>
+      <div className="flex items-start gap-2">
+        <AudioPlayer
+          text={exercise.expectedPhrase}
+          lang="el-GR"
+          autoPlay={autoPlayPrompt}
+        />
+        <p className="text-lg font-medium">{exercise.prompt}</p>
+      </div>
+
+      {showHint && (
+        <div className="mt-2 flex items-center gap-2">
+          <AudioPlayer text={exercise.expectedPhrase} lang="el-GR" />
+          <p className="text-sm text-muted italic">{exercise.expectedPhrase}</p>
+        </div>
+      )}
 
       <div className="mt-4">
         {inputMode === "audio" ? (
@@ -121,20 +126,31 @@ export function ExerciseCard({
           </form>
         )}
 
-        <Button
-          variant="ghost"
-          size="sm"
-          type="button"
-          onClick={() => {
-            setInputMode(inputMode === "audio" ? "text" : "audio");
-            setFeedback(null);
-            setSttError(null);
-          }}
-          disabled={isSubmittingAudio || isPending}
-          className="mt-3"
-        >
-          {inputMode === "audio" ? "Type instead" : "Speak instead"}
-        </Button>
+        <div className="mt-3 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            onClick={() => {
+              setInputMode(inputMode === "audio" ? "text" : "audio");
+              setFeedback(null);
+              setSttError(null);
+            }}
+            disabled={isSubmittingAudio || isPending}
+          >
+            {inputMode === "audio" ? "Type instead" : "Speak instead"}
+          </Button>
+          {!showHint && !isLocked && (
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              onClick={() => setShowHint(true)}
+            >
+              Show hint
+            </Button>
+          )}
+        </div>
       </div>
 
       {sttError && (
@@ -150,6 +166,14 @@ export function ExerciseCard({
           >
             {feedback.outcome === "pass" ? "Great job!" : feedback.reason}
           </FeedbackBanner>
+        </div>
+      )}
+
+      {isLocked && (
+        <div className="mt-4 flex justify-end">
+          <Button type="button" onClick={onNext}>
+            Next
+          </Button>
         </div>
       )}
     </Card>
