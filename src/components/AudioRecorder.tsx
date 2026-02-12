@@ -24,6 +24,8 @@ export function AudioRecorder({
     mimeType,
     durationMs,
     error,
+    nearLimit,
+    reachedLimit,
     startRecording,
     stopRecording,
     playRecording,
@@ -98,12 +100,14 @@ export function AudioRecorder({
           </button>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-            <span className="text-sm font-medium tabular-nums text-zinc-700 dark:text-zinc-300">
+            <span
+              className={`text-sm font-medium tabular-nums ${nearLimit ? "text-amber-600 dark:text-amber-400" : "text-zinc-700 dark:text-zinc-300"}`}
+            >
               {formatDuration(durationMs)}
             </span>
           </div>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Tap to stop
+            {nearLimit ? "Finishing soon..." : "Tap to stop"}
           </p>
         </>
       )}
@@ -174,6 +178,12 @@ export function AudioRecorder({
               : "Listen back, re-record, or submit."}
           </p>
         </>
+      )}
+
+      {reachedLimit && (
+        <p className="text-sm text-amber-600 dark:text-amber-400">
+          Maximum recording length reached.
+        </p>
       )}
 
       {error && (

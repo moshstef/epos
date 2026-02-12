@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   ACCEPTED_MIME_TYPES,
   MAX_AUDIO_SIZE_BYTES,
+  MIN_AUDIO_SIZE_BYTES,
   SttErrorCode,
   createSttService,
 } from "@/lib/stt";
 import type { SttErrorResponse, SttSuccessResponse } from "@/lib/stt";
+import { getClientIp, getRateLimiter } from "@/lib/rate-limiter";
 
 function errorResponse(
   code: string,
@@ -19,7 +21,6 @@ function errorResponse(
 function isAcceptedMime(mime: string): boolean {
   const normalized = mime.split(";").map((s) => s.trim());
   const base = normalized[0];
-  // Check exact match first, then base-only match
   return (
     (ACCEPTED_MIME_TYPES as readonly string[]).includes(mime) ||
     (ACCEPTED_MIME_TYPES as readonly string[]).includes(base)
@@ -29,6 +30,17 @@ function isAcceptedMime(mime: string): boolean {
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<SttSuccessResponse | SttErrorResponse>> {
+  // Rate limit check (before reading body)
+  const ip = getClientIp(request);
+  const rateLimit = getRateLimiter().check(ip);
+  if (!rateLimit.allowed) {
+    return errorResponse(
+      SttErrorCode.RATE_LIMIT_EXCEEDED,
+      "Too many requests. Please wait a moment before trying again.",
+      429
+    );
+  }
+
   // Early reject via Content-Length header
   const contentLength = request.headers.get("content-length");
   if (contentLength && parseInt(contentLength, 10) > MAX_AUDIO_SIZE_BYTES) {
@@ -46,7 +58,6 @@ export async function POST(
   let mimeType: string;
 
   if (isMultipart) {
-    // FormData with "audio" field
     let formData: FormData;
     try {
       formData = await request.formData();
@@ -71,7 +82,6 @@ export async function POST(
     audioBuffer = Buffer.from(arrayBuffer);
     mimeType = audioFile.type || "audio/webm";
   } else {
-    // Raw binary body
     const arrayBuffer = await request.arrayBuffer();
     audioBuffer = Buffer.from(arrayBuffer);
     mimeType = contentType || "audio/webm";
@@ -86,7 +96,16 @@ export async function POST(
     );
   }
 
-  // Validate size after read
+  // Validate minimum size
+  if (audioBuffer.length < MIN_AUDIO_SIZE_BYTES) {
+    return errorResponse(
+      SttErrorCode.AUDIO_TOO_SHORT,
+      "Audio is too short. Please try recording again.",
+      400
+    );
+  }
+
+  // Validate maximum size
   if (audioBuffer.length > MAX_AUDIO_SIZE_BYTES) {
     return errorResponse(
       SttErrorCode.REQUEST_TOO_LARGE,
