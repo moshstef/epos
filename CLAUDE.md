@@ -11,9 +11,9 @@ EPOS is an AI-assisted Greek language tutor MVP focused on speaking practice wit
 
 ## Current State
 
-This repository is in the **planning-complete, pre-implementation** phase. All product decisions, scope, and architecture are defined in documentation. No source code exists yet. Implementation follows the milestone roadmap in `docs/epos-github-milestones-issues.md`.
+M0 and M1 are complete. M2 (Controlled Speaking Practice) is complete — the full speaking loop is wired end-to-end: recording → STT (Deepgram) → deterministic analyzer → pass/retry outcome → attempt logging. Rate limiting and cost protection are in place. Implementation follows the milestone roadmap in `docs/epos-github-milestones-issues.md`.
 
-## Tech Stack (Planned)
+## Tech Stack
 
 - **Next.js App Router** — full-stack serverless, TypeScript, Tailwind CSS
 - **ESLint + Prettier** for code quality
@@ -48,6 +48,31 @@ Speaking practice checks are rule-based and limited:
 ### Data Model (Minimal)
 
 Four MVP entities: **Lesson**, **Exercise**, **Attempt**, **Session**. No analytics fields, scoring, or proficiency tracking.
+
+## Logging Guidelines
+
+All server-side code must include basic `console.error` / `console.log` logging for debugging during development. This is a stopgap until M4 (Silent Memory & Observability) introduces structured logging.
+
+**Rules:**
+
+- Every `catch` block must log the error with a **prefixed tag**: `console.error("[ModuleName] Description:", error)`
+- API routes log errors before returning error responses
+- Server actions log errors with context (e.g., relevant IDs) before re-throwing
+- **Do not** log sensitive data (API keys, user credentials)
+- **Do not** add verbose/debug logging for happy paths (keep noise low)
+
+**Prefix convention:** `[STT]`, `[submitAttempt]`, `[Coach]`, `[Import]`, etc.
+
+**Example:**
+
+```typescript
+} catch (error) {
+  console.error("[STT] Transcription failed:", error);
+  return errorResponse(SttErrorCode.STT_FAILURE, "STT service failed", 502);
+}
+```
+
+This will evolve into structured logging with levels, correlation IDs, and a log viewer in M4.
 
 ## Feature Boundaries
 
