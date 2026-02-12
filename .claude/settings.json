@@ -1,0 +1,47 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-dangerous.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/auto-format.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && pnpm test --run 2>&1 | tail -20 && pnpm lint 2>&1 | tail -10 && pnpm format:check 2>&1 | tail -10"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'REMINDER after compaction: Use pnpm (not npm). Follow MVP guardrails from CLAUDE.md. Subagent workflow: Planner (Sonnet) → Implementation → Reviewer (Sonnet) → Shipper (Haiku). Avoid forbidden vocabulary: evaluation (unqualified), assessment, semantic correction, error log.'"
+          }
+        ]
+      }
+    ]
+  }
+}
